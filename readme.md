@@ -247,9 +247,61 @@ constructor( @Inject(emailConfig.KEY) private config: ConfigType<typeof emailCon
 Nest.js 프레임워크에서 제공하는 환경변수 검증, 주입 도구를 활용하니 초기설정이 약간 복잡하지만 설정된 이후의 유지보수와 디버깅이 훨씬 간단해졌다.  
 이래서 형님들이 프레임워크를 만드셨고, 사용하시는구나...
 
+실수로 올라간 .env파일을 지우려면 .gitignore를 적절히 업데이트 한 다음  
+셸에서 `git rm --cached $(git ls-files -i -c -X .gitignore)`를 실행한다.
+
 ### 7. 파이프와 유효성 검사: 요청이 제대로 전달되었는지
 
-프론트에서 들어오는 값을 검사하자
+파이프는 요청이 컨트롤러로 전달되기 전에 요청을 변환할 수 있다. 미들웨어와 유사한데, 미들웨어는 애플리케이션의 모든 컨텍스트에서 사용할 수 없다.  
+파이프는 보통 변환과 유효성검사의 두 가지 역할을 수행한다. Nest에서 기본으로 제공하는 파이프는 다음과 같다.
+
+1. ValidationPipe
+2. ParseIntPipe
+3. ParseBoolPipe
+4. ParseArrayPipe
+5. ParseUUIDPipe
+6. DefaultValuePipe : 값이 들어오지 않을 때 기본값을 설정할때 사용한다.
+
+아래와 같이 DefaultValuePipe와 ParseIntPipe를 조합해서 활용할 수 있다.
+매개변수를 생략하면 기본값이 설정되지만 int로 파싱될 수 없는 값이 전달되면 파이프가 에러를 던진다.
+
+```typescript
+@Get()
+findAll(
+  @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
+  @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+)
+```
+
+유효성 검사 파이프를 만들기 위해 `class-validator`, `class-transformer`라이브러리를 설치한다.
+Joi보다 간편하게 유효성 검사에 활용가능하다.
+
+일반적으로 dto선언시 클래스의 속성 데커레이터로 class-validator에서 제공해주는 유효성 검사를 적용해 놓는다.  
+이후 decorated DTO를 대상으로 validation을 수행하는 ValidationPipe를 @Body()와 같은 파라미터 데커레이터의 인자로 주입한다.
+
+```typescript
+export class CreateUserDto { // DTO에 validator 적용
+  @IsString()
+  @MinLength(2)
+  @MaxLength(10)
+  name: string;
+
+  @IsEmail()
+  email: string;
+}
+
+@Post() // @Body() 데커레이터의 인자로 Validation Pipe전달하여 DTO를 검증.
+create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+  return this.userService.create(createUserDto)
+}
+```
+
+Validation Pipe를 전역스코프에 적용하려면 부트스트랩 과정에서
+`app.userGlobalPipe(new ValidationPipe())`와 같이 설정해준다.
+
+---
+
+유저 서비스에 유효성 검사 적용하기
 
 ### 8. 영속화: 데이터를 기록하고 다루기
 

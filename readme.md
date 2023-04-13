@@ -302,6 +302,50 @@ Validation Pipe를 전역스코프에 적용하려면 부트스트랩 과정에�
 ---
 
 유저 서비스에 유효성 검사 적용하기
+class-transformer에서 제공하는 `@Transfrom()`을 활용하면 손쉽게 커스템 밸리데이션 로직을 만들 수 있다.  
+@Transfrom의 인자는 전체 객체(보통 DTO)에 대한 값을 갖고있으므로, DTO의 속성간 비교하는 로직도 가능함.
+
+만약 @Transform을 사용하기 싫으면 아래와 같이 커스텀 유효성 검사기를 작성할 수 있다.
+(근데 아직 완전히 이해는 못함)
+
+```typescript
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
+
+export function NotIn(property: string, validationOptions?: ValidationOptions) {
+  // 데커레이터의 인수는 객체에서 참조하려는 다른 속성의 이름과 validationOptions를 받는다.
+  return (object: Object, propertyName: string) => {
+    //인수로 데커레이터가 선언될 객체와 속성이름을 받는다.
+    registerDecorator({
+      //ValidationDecoratorOptions의 객체를 인수로 받는다.
+      name: 'NotIn', // 데커레이터의 이름
+      target: object.constructor, // 이 데커레이터는 객체가 생성될때 적용됨을 의미
+      propertyName,
+      options: validationOptions, // 유효성 옵션은 인수로 전달받은 것을 사용한다.
+      constraints: [property], // 속성에 적용되도록 제약을 줌
+      validator: {
+        // 유효성 검사 규칙이 정의됨
+        validate(value: any, args: ValidationArguments) {
+          console.log('value', value);
+          console.log('args', args);
+          const [relatedPropertyName] = args.constraints;
+          const relatedValue = (args.object as any)[relatedPropertyName];
+          return (
+            typeof value === 'string' &&
+            typeof relatedValue === 'string' &&
+            !relatedValue.includes(value)
+          );
+        },
+      },
+    });
+  };
+}
+```
 
 ### 8. 영속화: 데이터를 기록하고 다루기
 

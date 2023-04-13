@@ -153,6 +153,57 @@ Nest.js의 스코프
 
 ### 5. SW 복잡도를 낮추기 위한 모듈 설계
 
+모듈은 함수나 클래스보단 큰 단위로 `논리적 기능`단위로 분리된 조각이다.
+음식점 서비스는 UserModule, OrderModule, DeliveryModule과 같이 분리 가능하다.
+
+네스트에서 모듈은 `@Module(metadata: ModuleMetadata):ClassDecorator`로 수식된 클래스다.
+import는 이 모듈에서 사용하기위해 다른 모듈에 있는 프로바이더를 가지고 오는 부분이다.
+모듈은 주입해서 사용할 수 없는데, 순환종속성이 발생할 수 있기 때문이다.
+따라서 트리와 같은 구조로 import 해서 사용해야 하고,
+중간모듈에서 하위 모듈을 import, export하면 상위 모듈은 중간모듈만 import해도 하위 모듈에 접근할 수 있다.
+모듈들에 위계적으로, 이행적으로 접근할 수 있다.
+
+---
+
+유저 서비스에 모듈 분리 적용하기
+아래와 같이 적용된다.
+모듈이 중복 import되면 오류가 발생한다.
+맨 아래 Email 모듈에서 EmailService를 export하여 유저모듈에서 Email 모듈만 import 해도 EmailService를 사용할 수 있다.
+
+app.module.ts
+
+```typescript
+@Module({
+  imports: [UsersModule] // Email 모듈을 더 이상 참조하지 않으므로 삭제
+  controllers: [AppController],
+  providers: [AppService],
+})
+```
+
+user.module.ts
+
+```typescript
+@Module({
+  imports: [EmailModule],
+  controllers: [UsersController],
+  providers: [UsersService],
+  // providers: [UsersService, EmailService], email.module.ts에서 서비스르 export 해주므로 직접 참조하지 않아도 된다.
+})
+export class UsersModule {}
+```
+
+email.module.ts
+
+```typescript
+@Module({
+  providers: [EmailService],
+  // Email Provider를 모듈 바깥에서 사용할 수 있게 명시해준다.
+  // Email Module만 import한 모듈에서도 Email Service를 사용할 수 있다.
+  exports: [EmailService],
+})
+export class EmailModule {}
+```
+
 ### 6. 동적 모듈을 활용한 환경 변수 구성
 
 local, stage, development 환경변수 동적 구성

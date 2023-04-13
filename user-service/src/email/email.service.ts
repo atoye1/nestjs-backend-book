@@ -1,6 +1,8 @@
 import Mail = require('nodemailer/lib/mailer');
 import * as nodemailer from 'nodemailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import emailConfig from 'config/emailConfig';
 
 interface EmailOptions {
   from: string;
@@ -13,12 +15,14 @@ interface EmailOptions {
 export class EmailService {
   private transporter: Mail;
   // 생성자에서 transporter 객체를 만들어, 이후의 메서드에서 활용한다.
-  constructor() {
+  constructor(
+    @Inject(emailConfig.KEY) private config: ConfigType<typeof emailConfig>,
+  ) {
     this.transporter = nodemailer.createTransport({
-      service: 'naver',
+      service: this.config.service,
       auth: {
-        user: 'atoyemailman@naver.com',
-        pass: 'sendmail',
+        user: this.config.auth.user,
+        pass: this.config.auth.pass,
       },
     });
   }
@@ -29,12 +33,12 @@ export class EmailService {
     emailAddress: string,
     signupVerifyToken: string,
   ) {
-    const baseUrl = 'http://localhost:3000';
+    const baseUrl = this.config.baseUrl;
     const url =
       baseUrl + `/users/email-verifiy?signupVerifyToken=${signupVerifyToken}`;
     const mailOptions: EmailOptions = {
       // 네이버의 경우 from을 실제 주소와 동일하게 하지 않으면 인증 오류 발생.
-      from: 'atoyemailman@naver.com',
+      from: this.config.from,
       to: emailAddress,
       subject: '가입 인증 메일',
       html: `

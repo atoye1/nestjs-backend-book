@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as uuid from 'uuid';
 import { EmailService } from 'email/email.service';
+import { UserInfo } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +12,21 @@ export class UsersService {
     const signupVerifyToken = uuid.v1();
     await this.saveUser(name, email, password, signupVerifyToken);
     await this.sendMemberJoinEmail(email, signupVerifyToken);
+  }
+
+  async verifyEmail(signupVerifyToken: string): Promise<string> {
+    // TODO
+    // 1. DB에서 가입 처리중인 유저가 있는지 조회하고 없으면 에러처리
+    // 2. 바로 로그인 상태가 되도록 JWT발급
+    throw new Error('Method not implemented');
+  }
+
+  async login(email, password): Promise<string> {
+    throw new Error('Method not implemented');
+  }
+
+  async getUserInfo(userId: number): Promise<UserInfo> {
+    throw new Error('Method not implemented');
   }
 
   private checkUserExist(email: string) {

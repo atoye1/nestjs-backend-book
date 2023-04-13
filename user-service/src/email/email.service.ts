@@ -18,7 +18,7 @@ export class EmailService {
       service: 'naver',
       auth: {
         user: 'atoyemailman@naver.com',
-        pass: '<sendmail pw>',
+        pass: 'sendmail',
       },
     });
   }

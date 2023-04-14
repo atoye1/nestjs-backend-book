@@ -369,6 +369,64 @@ typeorm을 활용한 db 연결
 4. @InjectRepository데커레이터를 활용해서 서비스에 유저 저장소를 주입한다.(당연히 생성자에 주입.)
    - `@InjectRepository(UserEntity) private usersRepository: Repository<UserEntity>`
 
+TypeOrm에서 트랜잭션 적용하는 방법은 두 가지가 있다.
+
+1. QueryRunner를 사용(공식문서에서 추천하는 방식)
+
+```typescript
+  private async saveUserUsingQueryRunner(
+    name: string,
+    email: string,
+    password: string,
+    signupVerifyToken: string,
+  ) {
+    const queryRunner = this.datasource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const user = new UserEntity();
+      user.id = uuid.v1();
+      user.name = name;
+      user.password = password;
+      user.email = email;
+      user.signupVerifyToken = signupVerifyToken;
+      await queryRunner.manager.save(user);
+      throw new InternalServerErrorException();
+      return true;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      return false;
+    } finally { // try...catch 안에서 return은 finally블록 실행 이후에 실행되므로 정상적으로 release() 할 수 있다.
+      console.log('finally works');
+      await queryRunner.release();
+    }
+  }
+```
+
+2. transaction 함수를 직접 사용 : 문법이 훨씬 간결해보인다. 하지만 세부적으로 통제가능한 query Runner 방식이 더 좋아 보임.
+
+```typescript
+private async saveUserUsingTransaction(
+    name: string,
+    email: string,
+    password: string,
+    signupVerifyToken: string,
+  ) {
+    await this.dataSource.transaction(async (manager) => {
+      const user = new UserEntity();
+      user.id = ulid();
+      user.name = name;
+      user.email = email;
+      user.password = password;
+      user.signupVerifyToken = signupVerifyToken;
+
+      await manager.save(user);
+    });
+  }
+```
+
 ### 9. 요청 처리 전에 부기기능을 수행하기 위한 미들웨어
 
 ### 10. 권한 확인을 위한 가드 : JWT 인증 / 인가

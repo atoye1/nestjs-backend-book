@@ -46,7 +46,7 @@ export class AppModule implements NestModule {
     //   .apply(LoggerMiddleWare, LoggerMiddleWare2)
     //   .exclude('/noLogger')
     //   .forRoutes('/');
-    // forRoute에는 경로 이외에도 컨트롤러 클래스 이름을 바로 전달할 수 있음
+    // forRoute에는 경로 이외에도 컨트롤러 클래스를 바로 전달할 수 있음
     // consumer
     //   .apply(LoggerMiddleWare, LoggerMiddleWare2)
     //   .forRoutes(UsersController);

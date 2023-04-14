@@ -427,6 +427,40 @@ private async saveUserUsingTransaction(
   }
 ```
 
+마이그레이션
+
+시행착오가 제법 있었지만 이렇게 정리 할 수 있다.
+
+1. migration:create
+
+- 빈 마이그레이션 파일을 만듦, 개발자가 직접 쿼리를 작성해야함
+
+2. migration:generate
+
+- 현재 entity와 DB를 비교해서 둘을 동기화하기 위한 쿼리를 TypeOrm이 생성해줌
+- 만약 변경내역이 없다면 생성해주지 않음
+- (nest를 watch모드로 실행중이고 synchronize가 true라면 네스트가 엔티티 변경시마다 자동으로 동기화해놓아서 생성안됨)
+
+3. migration:run, migration:revert
+
+- 마이그레이션을 수행하고 되돌릴 수 있음.
+
+4. 마이그레이션 과정의 트러블 슈팅
+
+- 타입스크립트 컴파일러가 dist폴더에 생성한 마이그레이션 파일을 정리해야 깔끔하게 마이그레이션 할 수 있음.
+- dataSource를 전달하는 명령어와 전달하지 않는 경우를 잘 파악해야함.
+- nest의 synchronize옵션 등을 잘 확인하고 설정한 뒤 마이그레이션 해야함.
+- 교재에 있는 `typeorm` 스크립트가 틀려서 ts-node를 node로 변경해줌(저자 선생님도 헷갈린듯)
+- ormconfig.ts 파일에다 아래와 같이 migration파일의 경로를 잘 설정해줘야 한다. js만 포함되어 있어서 migration파일을 인식못하는 문제가 있었다.
+  (책에도 잘못 나와있는듯)
+  - migrations: [__dirname + '/**/migrations/*.{ts,js}'],
+
+```json
+// pakcage.json의 script에 아래 내용을 추가
+"typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
+"typeorm:d": "node -r ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"
+```
+
 ### 9. 요청 처리 전에 부기기능을 수행하기 위한 미들웨어
 
 ### 10. 권한 확인을 위한 가드 : JWT 인증 / 인가

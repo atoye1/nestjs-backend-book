@@ -495,6 +495,13 @@ exclude, forRoute 메서드를 활용해서 미들웨어의 적용 범위를 라
 
 가드는 CanActivate 인터페이스를 구현하여 만들 수 있다.
 
+JWT를 활용한 인증을 위해 디펜던시 설치
+`npm i jsonwebtoken && npm i -D @types/jsonwebtoken`
+
+> dto에 class-validation을 적용안한 부분에서 딱 오타가 생겨서 typescript랑 nest가 undefined 처리를 제대로 안해주는 바람에 DB 연결부분이 오류발생해서 한시간동안 고치느라 삽질... signupVerifyToken을 singupVerifyToken으로 적었다.
+
+> 정말이지 형님들이 만들어 놓은건 다 이유가 있었어... 오늘도 삽질을 통해 뼈저리게 느낍니다.
+
 ### 11. 로깅 : 애플리케이션의 동작 기록
 
 ### 12. 모든 것은 항상 실패한다 : 예외 필터

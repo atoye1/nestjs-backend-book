@@ -1,3 +1,6 @@
+import { IsString } from 'class-validator';
+
 export class VerifyEmailDto {
-  singnupVerifyToken: string;
+  @IsString()
+  signupVerifyToken: string;
 }

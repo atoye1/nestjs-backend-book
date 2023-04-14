@@ -14,8 +14,8 @@ export class UserEntity {
   @Column({ length: 30 })
   password: string;
 
-  @Column({ length: 30 })
-  migrationTest: string;
+  @Column({ default: false })
+  emailVerified: boolean;
 
   @Column({ length: 60 })
   signupVerifyToken: string;

@@ -33,9 +33,10 @@ export class EmailService {
     emailAddress: string,
     signupVerifyToken: string,
   ) {
+    console.log({ signupVerifyToken });
     const baseUrl = this.config.baseUrl;
     const url =
-      baseUrl + `/users/email-verifiy?signupVerifyToken=${signupVerifyToken}`;
+      baseUrl + `/users/email-verify?signupVerifyToken=${signupVerifyToken}`;
     const mailOptions: EmailOptions = {
       // 네이버의 경우 from을 실제 주소와 동일하게 하지 않으면 인증 오류 발생.
       from: this.config.from,

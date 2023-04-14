@@ -447,23 +447,53 @@ private async saveUserUsingTransaction(
 
 4. 마이그레이션 과정의 트러블 슈팅
 
-- 타입스크립트 컴파일러가 dist폴더에 생성한 마이그레이션 파일을 정리해야 깔끔하게 마이그레이션 할 수 있음.
-- dataSource를 전달하는 명령어와 전달하지 않는 경우를 잘 파악해야함.
-- nest의 synchronize옵션 등을 잘 확인하고 설정한 뒤 마이그레이션 해야함.
-- 교재에 있는 `typeorm` 스크립트가 틀려서 ts-node를 node로 변경해줌(저자 선생님도 헷갈린듯)
+- 타입스크립트 컴파일러가 dist폴더에 생성한 마이그레이션 파일이 있는지 확인해 보고 필요시 정리해야 함.
+- dataSource를 전달하는 명령어와 전달하지 명령어를 잘 구분해야함.
+- nest의 synchronize 옵션을 잘 확인하고 자동으로 테이블이 업데이트되지 않게 설정한 뒤 마이그레이션 해야함.
 - ormconfig.ts 파일에다 아래와 같이 migration파일의 경로를 잘 설정해줘야 한다. js만 포함되어 있어서 migration파일을 인식못하는 문제가 있었다.
   (책에도 잘못 나와있는듯)
+
   - migrations: [__dirname + '/**/migrations/*.{ts,js}'],
 
-```json
-// pakcage.json의 script에 아래 내용을 추가
-"typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
-"typeorm:d": "node -r ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"
-```
+- 교재에 있는 `typeorm` npm 스크립트가 틀려서 아래와 같이 ts-node를 node로 변경해줌(저자 선생님도 헷갈린듯)
+  ```json
+  // pakcage.json의 script에 아래 내용을 추가
+  "typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
+  "typeorm:d": "node -r ts-node/register ./node_modules/typeorm/cli.js -d ormconfig.ts"
+  ```
 
 ### 9. 요청 처리 전에 부기기능을 수행하기 위한 미들웨어
 
+미들웨어는 요청이 핸들러에 전달되기 전에 요청을 변화시키는 모듈이다. 다음과 같은 역할을 수행한다.
+
+1. 쿠키 파싱 - express에서도 cookie-parser가 있었음
+2. 세션 관리 - express도 session관리 미들웨어를 사용했었지..
+3. 인증 / 인가 - 커스텀 미들웨어에 passport 전략을 탑재해서 사용했었다.
+4. 본문 파싱 - Body에 포함되는 Json형식의 데이터 뿐만 아니라 스트림도 파싱할 수 있음.
+
+미들웨어를 학습하기 위해서 Logger 미들웨어를 구현해보자
+편의상 이미 모듈들이 설정되어 있는 user서비스에다 그대로 구현한다.
+
+미들웨어는 보통 NestMiddleWare 인터페이스를 구현하는 클래스로 작성할수 있다.  
+하지만 전역에 적용할 미들웨어는 함수형태로 만들어야 한다. express의 미들웨어처럼 작성할 수 있고 main.ts에 app.use(전역미들웨어) 해주면 간단하게 사용할 수 있다.
+
+미들웨어는 내부적으로 next()를 꼭 호출해줘야함을 잊지말자.
+
+클래스로 작성된 미들웨어는 AppModule의 configure 메서드에 작성한다.
+exclude, forRoute 메서드를 활용해서 미들웨어의 적용 범위를 라우팅 가능하다.
+함수형으로 작성된 미들웨어도 req객체에 직접 접근가능하므로 라우팅이 가능할텐데, 굳이 express 스타일로 그렇게 할 이유는 없어보인다.
+
 ### 10. 권한 확인을 위한 가드 : JWT 인증 / 인가
+
+인증/인가가 헷갈리는 경우가 많은데 이렇게 정리하면 간단할거같음.
+인'증' -> '증'명 -> 너가 누군지 증명해!
+인'가' -> 허'가' -> 너한테 접근허가 해줄게!
+
+인증은 미들웨어로 구현가능하지만, 인가는 가드로 구현한다.
+미들웨어는 실행컨텍스트에 접근하지 못하기 때문이다.
+타겟 자원에만(컨트롤러나 핸들러 단위, 전역에도 가능) 가드를 씌우면 효과적인 관점지향 프로그래밍을 할 수 있다.
+
+가드는 CanActivate 인터페이스를 구현하여 만들 수 있다.
 
 ### 11. 로깅 : 애플리케이션의 동작 기록
 

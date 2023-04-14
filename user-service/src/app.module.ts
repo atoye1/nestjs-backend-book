@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersExampleModule } from 'providers-example/providers-example.module';
@@ -7,6 +7,9 @@ import { ConfigModule } from '@nestjs/config';
 import emailConfig from 'config/emailConfig';
 import { validationSchema } from 'config/validationSchema';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { LoggerMiddleWare } from './logger/logger.middleware';
+import { LoggerMiddleWare2 } from './logger/logger.middleware2';
+import { UsersController } from 'users/users.controller';
 
 @Module({
   imports: [
@@ -33,4 +36,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): any {
+    // 미들웨어를 어디에 적용할지 지정할 수 있음
+    // exclude, forRoutes로 경로를 손쉽게 지정가능
+    consumer
+      .apply(LoggerMiddleWare, LoggerMiddleWare2)
+      .exclude('/noLogger')
+      .forRoutes('/');
+    // forRoute에는 경로 이외에도 컨트롤러 클래스 이름을 바로 전달할 수 있음
+    consumer
+      .apply(LoggerMiddleWare, LoggerMiddleWare2)
+      .forRoutes(UsersController);
+  }
+}

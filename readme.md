@@ -351,6 +351,24 @@ export function NotIn(property: string, validationOptions?: ValidationOptions) {
 
 typeorm을 활용한 db 연결
 
+디펜던시 설치해준다.
+
+`npm i typeorm@0.3.7 @nestjs/typeorm@9.0.0 mysql2`
+
+.env에 있는 내용이 동적으로 로딩되게 설정해 놓았으므로 process.env의 내용을 전역에서 사용가능하다.  
+이 정보로 db에 접속한다.
+
+엔티티를 정의하고, 모듈을 등록하고, 저장소객체를 생성해서 서비스에 저장소를 주입해야하는데 조금 혼란스러울 수 있으니 아래와 같이 차근차근 하면 된다. 순서는 알고 있어야 나중에 구글링하더라도 이해가 빠르다.
+
+1. 엔티티를 정의한다. @Entitiy(entitiy-name)로 수식된 클래스가 있는 entitiy파일을 신규로 생성한다.
+2. 엔티티를 외부 DB에서 사용할 수 있게 루트모듈의 TypeOrmModule의 entities에 등록해줘야 한다.
+   - 만약 synchronize가 true라면 네스트는 여기 등록된 엔티티를 기준으로 테이블을 갱신한다.
+3. UserModule에서 모듈 내에 사용할 저장소를 등록한다.
+   - 2번은 네스트 외부에 전달하기위해 등록한 것이라면, 3번은 네스트 안에서 사용하기위해 등록한것
+   - `TypeOrmModule.forFeature([UserEntity])` 모듈 내에서 사용할거니깐 forFeature로 등록한다.
+4. @InjectRepository데커레이터를 활용해서 서비스에 유저 저장소를 주입한다.(당연히 생성자에 주입.)
+   - `@InjectRepository(UserEntity) private usersRepository: Repository<UserEntity>`
+
 ### 9. 요청 처리 전에 부기기능을 수행하기 위한 미들웨어
 
 ### 10. 권한 확인을 위한 가드 : JWT 인증 / 인가

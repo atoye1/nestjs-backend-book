@@ -25,6 +25,7 @@ export class CreateUserDto {
     // }
     return value.trim();
   })
+  // 메시지를 여기서 지정해도 되고 validator 메서드 안에서 지정해도 된다.
   @NotIn('password', { message: 'password should not contain name' })
   @IsString()
   @MinLength(2)

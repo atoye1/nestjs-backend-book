@@ -30,6 +30,10 @@ export function NotIn(property: string, validationOptions?: ValidationOptions) {
             !relatedValue.includes(value)
           );
         },
+        defaultMessage() {
+          // 데커레이터 평가시에 인자로 지정해주면 여기 옵션은 오버라이드됨.
+          return 'haha you failed!!';
+        },
       },
     });
   };

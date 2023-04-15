@@ -2,6 +2,7 @@ import {
   Get,
   Query,
   Param,
+  Req,
   Headers,
   Body,
   Post,
@@ -16,6 +17,7 @@ import { UsersService } from './users.service';
 import { AuthService } from 'auth/auth.service';
 import { UserInfo } from './Userinfo';
 import { AuthGuard } from 'guards/auth.guard';
+import { MyGuard } from 'guards/my.guard';
 
 @Controller('users')
 export class UsersController {
@@ -42,10 +44,11 @@ export class UsersController {
     return await this.usersService.login(email, password);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, MyGuard)
   @Get('/:id')
   async getUserInfo(
-    @Headers() headers: any,
+    @Req() req: any,
+    // @Headers() headers: any,
     @Param('id') userId: string,
   ): Promise<UserInfo> {
     // const jwtString = headers.authorization.split('Bearer ')[1];
@@ -53,6 +56,8 @@ export class UsersController {
     // Guard 데커레이터로 더 좋은 디자인 패턴으로 개선해야한다.
     // this.authService.verify(jwtString);
     // 여기서 userId를 파싱할 수 있긴하지만, Restful하게 설계하기 위해 파라미터로 받은 값만 사용한다.
+    const { authUserId } = req;
+    console.log({ authUserId });
     return await this.usersService.getUserInfo(userId);
   }
 }

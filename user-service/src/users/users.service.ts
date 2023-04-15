@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   UnprocessableEntityException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as uuid from 'uuid';
 import { ulid } from 'ulid';
@@ -59,8 +60,16 @@ export class UsersService {
     });
   }
 
-  async login(email, password): Promise<string> {
-    throw new Error('Method not implemented');
+  async login(email: string, password: string): Promise<string> {
+    const user = await this.userRepository.findOne({
+      where: { email, password },
+    });
+    if (!user) throw new NotFoundException('No such user');
+    return this.authService.login({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
   }
 
   async getUserInfo(userId: string): Promise<UserInfo> {

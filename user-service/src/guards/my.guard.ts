@@ -3,8 +3,12 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { AuthService } from 'auth/auth.service';
 
+/**
+ * 오직 내 정보만 가져 올 수 있도록 제한하는 가드!
+ * 내가 구현해서 뿌듯함!!
+ */
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class MyGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
   canActivate(
@@ -17,7 +21,7 @@ export class AuthGuard implements CanActivate {
   private validateRequest(request: Request) {
     const jwtString = request.headers.authorization?.split('Bearer ')[1];
     const { userId } = this.authService.verify(jwtString);
-    request['authUserId'] = userId; // 가드 안에서 req 객체에 값을 추가할 수 있다.
-    return true;
+    const requestedUserId = request.params.id;
+    return userId === requestedUserId;
   }
 }

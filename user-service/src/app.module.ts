@@ -32,7 +32,7 @@ import authConfig from 'config/authConfig';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_DB,
       entities: [__dirname + '/**/*.entity.{ts,js}'],
-      synchronize: process.env.DATABASE_SYNCHRONIZE === 'true', // 서버 구동시 엔티티 기반으로 스키마를 변경하는 옵션
+      synchronize: process.env.DATABASE_SYNCHRONIZE === 'true', // 서버 구동시 엔티티 기반으로 스키마를 변경하는 옵션이다.
     }),
   ],
   controllers: [AppController],

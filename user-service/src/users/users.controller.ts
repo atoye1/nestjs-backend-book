@@ -3,12 +3,14 @@ import {
   Query,
   Param,
   Req,
-  Headers,
   Body,
   Post,
   Controller,
-  ParseIntPipe,
   UseGuards,
+  Inject,
+  LoggerService,
+  InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
@@ -17,16 +19,18 @@ import { UsersService } from './users.service';
 import { AuthService } from 'auth/auth.service';
 import { UserInfo } from './Userinfo';
 import { AuthGuard } from 'guards/auth.guard';
-import { MyGuard } from 'guards/my.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
+    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
+
   @Post()
   async createUser(@Body() dto: CreateUserDto): Promise<any> {
+    this.printLoggerServiceLog(dto);
     const { name, email, password } = dto;
     return this.usersService.createUser(name, email, password);
   }
@@ -44,7 +48,9 @@ export class UsersController {
     return await this.usersService.login(email, password);
   }
 
-  @UseGuards(AuthGuard, MyGuard)
+  // param을 파싱하는 컨트롤러 배치순서 주의해야 한다.
+
+  @UseGuards(AuthGuard)
   @Get('/:id')
   async getUserInfo(
     @Req() req: any,
@@ -59,5 +65,17 @@ export class UsersController {
     const { authUserId } = req;
     console.log({ authUserId });
     return await this.usersService.getUserInfo(userId);
+  }
+
+  private printLoggerServiceLog(dto: CreateUserDto) {
+    // 내장로거는 객체를 메시지로 자동변환해주지 않으므로 JSON.stringify(dto) 해줘야한다.
+    try {
+      throw new InternalServerErrorException('for test');
+    } catch (e) {
+      // 에러 로그는 stack을 출력해주면 디버깅에 좋다
+      this.logger.error(JSON.stringify(dto), e.stack);
+    }
+    this.logger.verbose('verbose: ', JSON.stringify(dto));
+    this.logger.debug('debug: ', JSON.stringify(dto));
   }
 }

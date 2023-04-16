@@ -11,6 +11,7 @@ import {
   LoggerService,
   InternalServerErrorException,
   Logger,
+  HttpException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
@@ -27,6 +28,11 @@ export class UsersController {
     private authService: AuthService,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
+
+  @Get('/error')
+  throwError(): void {
+    throw new HttpException('my custom http exception(400)', 400);
+  }
 
   @Post()
   async createUser(@Body() dto: CreateUserDto): Promise<any> {

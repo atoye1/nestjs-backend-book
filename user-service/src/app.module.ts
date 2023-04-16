@@ -11,10 +11,12 @@ import { LoggerMiddleWare } from './logger/logger.middleware';
 import { LoggerMiddleWare2 } from './logger/logger.middleware2';
 import { UsersController } from 'users/users.controller';
 import { AuthService } from './auth/auth.service';
+import { ExceptionModule } from './exception/exception.module';
 import authConfig from 'config/authConfig';
 
 @Module({
   imports: [
+    ExceptionModule,
     ProvidersExampleModule,
     UsersModule,
     ConfigModule.forRoot({
@@ -34,9 +36,10 @@ import authConfig from 'config/authConfig';
       entities: [__dirname + '/**/*.entity.{ts,js}'],
       synchronize: process.env.DATABASE_SYNCHRONIZE === 'true', // 서버 구동시 엔티티 기반으로 스키마를 변경하는 옵션이다.
     }),
+    ExceptionModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService, Logger],
+  providers: [AppService, AuthService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

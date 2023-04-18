@@ -19,6 +19,7 @@ import { BatchModule } from './batch/batch.module';
 import { HealthCheckController } from './health-check/health-check.controller';
 import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
+import { DogHealthIndicator } from 'health-check/dog.health';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, DogHealthIndicator],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

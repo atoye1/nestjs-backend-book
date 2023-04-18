@@ -20,8 +20,6 @@ export function NotIn(property: string, validationOptions?: ValidationOptions) {
       validator: {
         // 유효성 검사 규칙이 정의됨
         validate(value: any, args: ValidationArguments) {
-          console.log('value', value);
-          console.log('args', args);
           const [relatedPropertyName] = args.constraints;
           const relatedValue = (args.object as any)[relatedPropertyName];
           return (

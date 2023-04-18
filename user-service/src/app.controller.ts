@@ -1,4 +1,10 @@
-import { Controller, Get, Redirect, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Redirect,
+  Query,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()

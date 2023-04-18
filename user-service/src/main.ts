@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { loggerConfig } from 'config/loggerConfig';
 import { HttpExceptionFilter } from 'exception/httpException.filter';
+import { LoggingInterceptor } from 'interceptors/logging.intercepter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, loggerConfig);

@@ -14,6 +14,7 @@ import { ExceptionModule } from './exception/exception.module';
 import emailConfig from 'config/emailConfig';
 import authConfig from 'config/authConfig';
 import { ormConfig } from 'config/ormConfig';
+import { LoggingModule } from 'logging/logging.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ormConfig } from 'config/ormConfig';
     }),
     TypeOrmModule.forRootAsync(ormConfig),
     ExceptionModule,
+    LoggingModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

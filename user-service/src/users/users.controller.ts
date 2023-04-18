@@ -23,6 +23,7 @@ import { UserInfo } from './Userinfo';
 import { AuthGuard } from 'guards/auth.guard';
 import { CreateUserCommand } from './command/createUser.command';
 import { VerifyEmailCommand } from './command/verifyEmail.command';
+import { LoginCommand } from './command/login.command';
 
 @Controller('users')
 export class UsersController {
@@ -56,7 +57,8 @@ export class UsersController {
   @Post('/login')
   async login(@Body() dto: UserLoginDto): Promise<any> {
     const { email, password } = dto;
-    return await this.usersService.login(email, password);
+    const command = new LoginCommand(email, password);
+    return this.commandBus.execute(command);
   }
 
   // param을 파싱하는 컨트롤러 배치순서 주의해야 한다.

@@ -25,53 +25,6 @@ export class UsersService {
     private dataSource: DataSource,
   ) {}
 
-  async createUser(name: string, email: string, password: string) {
-    const userExists = await this.checkUserExist(email);
-    if (userExists)
-      throw new UnprocessableEntityException(`${email} Already Exists!`);
-
-    const signupVerifyToken = ulid();
-    const saveResult = await this.saveUserUsingQueryRunner(
-      name,
-      email,
-      password,
-      signupVerifyToken,
-    );
-    if (saveResult) await this.sendMemberJoinEmail(email, signupVerifyToken);
-  }
-
-  async verifyEmail(signupVerifyToken: string): Promise<string> {
-    // TODO
-    // 1. DB에서 가입 처리중인 유저가 있는지 조회하고 없으면 에러처리
-    console.log('in users.service.ts');
-    console.log({ signupVerifyToken });
-    const user = await this.userRepository.findOne({
-      where: { signupVerifyToken: signupVerifyToken },
-    });
-    if (!user) throw new NotFoundException('No Such User');
-    console.log(user);
-    user.emailVerified = true;
-    await this.userRepository.save(user);
-    // 2. 바로 로그인 상태가 되도록 JWT발급
-    return this.authService.login({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  }
-
-  async login(email: string, password: string): Promise<string> {
-    const user = await this.userRepository.findOne({
-      where: { email, password },
-    });
-    if (!user) throw new NotFoundException('No such user');
-    return this.authService.login({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  }
-
   async getUserInfo(userId: string): Promise<UserInfo> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('no such user');

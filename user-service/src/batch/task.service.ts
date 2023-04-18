@@ -16,10 +16,10 @@ export class TaskService {
   // }
 
   addCronJob() {
-    const name = '5 sec cronjob sample';
+    const name = '5cronSample';
 
     const job = new CronJob('*/5 * * * * *', () => {
-      this.logger.warn(`run! ${name}`);
+      this.logger.warn(`RUNNING! ${name}`);
     });
 
     this.schedulerRegistry.addCronJob(name, job);

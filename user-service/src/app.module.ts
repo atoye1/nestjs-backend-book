@@ -16,6 +16,9 @@ import authConfig from 'config/authConfig';
 import { ormConfig } from 'config/ormConfig';
 import { LoggingModule } from 'logging/logging.module';
 import { BatchModule } from './batch/batch.module';
+import { HealthCheckController } from './health-check/health-check.controller';
+import { TerminusModule } from '@nestjs/terminus';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -32,8 +35,10 @@ import { BatchModule } from './batch/batch.module';
     ExceptionModule,
     LoggingModule,
     BatchModule,
+    TerminusModule,
+    HttpModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthCheckController],
   providers: [AppService, AuthService],
 })
 export class AppModule implements NestModule {

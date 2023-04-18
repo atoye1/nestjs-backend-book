@@ -13,24 +13,23 @@ import {
   Logger,
   HttpException,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserDto } from './dto/createUserDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
 import { UserLoginDto } from './dto/UserLoginDto';
-import { UsersService } from './users.service';
 import { AuthService } from 'auth/auth.service';
 import { UserInfo } from './Userinfo';
 import { AuthGuard } from 'guards/auth.guard';
 import { CreateUserCommand } from './command/createUser.command';
 import { VerifyEmailCommand } from './command/verifyEmail.command';
 import { LoginCommand } from './command/login.command';
+import { GetUserInfoQuery } from './query/getUserInfo.query';
 
 @Controller('users')
 export class UsersController {
   constructor(
-    private usersService: UsersService,
-    private authService: AuthService,
     private commandBus: CommandBus,
+    private queryBus: QueryBus,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
@@ -75,9 +74,8 @@ export class UsersController {
     // Guard 데커레이터로 더 좋은 디자인 패턴으로 개선해야한다.
     // this.authService.verify(jwtString);
     // 여기서 userId를 파싱할 수 있긴하지만, Restful하게 설계하기 위해 파라미터로 받은 값만 사용한다.
-    const { authUserId } = req;
-    console.log({ authUserId });
-    return await this.usersService.getUserInfo(userId);
+    const getUserInfoQuery = new GetUserInfoQuery(userId);
+    return await this.queryBus.execute(getUserInfoQuery);
   }
 
   private printLoggerServiceLog(dto: CreateUserDto) {

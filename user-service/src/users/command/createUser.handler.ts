@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from './createUser.command';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import * as uuid from 'uuid';
@@ -8,6 +8,8 @@ import { DataSource, Repository } from 'typeorm';
 import { UserEntity } from '../entitiy/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'auth/auth.service';
+import { UserCreatedEvent } from 'users/event/userCreated.event';
+import { TestEvent } from 'users/event/test.event';
 
 @Injectable()
 @CommandHandler(CreateUserCommand)
@@ -18,6 +20,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     private dataSource: DataSource,
+    private eventBus: EventBus,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<any> {
@@ -34,6 +37,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       signupVerifyToken,
     );
     if (saveResult) await this.sendMemberJoinEmail(email, signupVerifyToken);
+
+    this.eventBus.publish(new UserCreatedEvent(email, signupVerifyToken));
+    this.eventBus.publish(new TestEvent());
   }
 
   private async checkUserExist(email: string) {

@@ -1,5 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
 import { Controller, Get } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import {
   HealthCheck,
   HealthCheckService,
@@ -8,7 +9,7 @@ import {
 } from '@nestjs/terminus';
 import { DogHealthIndicator } from './dog.health';
 
-@Controller('health-check')
+@Controller('healthCheck')
 export class HealthCheckController {
   constructor(
     private health: HealthCheckService,
@@ -17,11 +18,11 @@ export class HealthCheckController {
     private dogs: DogHealthIndicator,
   ) {}
 
-  @Get()
+  @Cron('*/5 * * * * *')
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
+      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.rcom'),
       () => this.http.pingCheck('localhost', 'http://localhost:3000'),
       () => this.db.pingCheck('database'),
       () => this.dogs.isHealthy('dogs'),

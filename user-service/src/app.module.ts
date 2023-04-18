@@ -16,8 +16,8 @@ import authConfig from 'config/authConfig';
 import { ormConfig } from 'config/ormConfig';
 import { LoggingModule } from 'logging/logging.module';
 import { BatchModule } from './batch/batch.module';
-import { HealthCheckController } from './health-check/health-check.controller';
-import { TerminusModule } from '@nestjs/terminus';
+import { HealthCheckController } from './health-check/healthCheck.controller';
+import { HealthCheckService, TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
 import { DogHealthIndicator } from 'health-check/dog.health';
 
@@ -40,6 +40,7 @@ import { DogHealthIndicator } from 'health-check/dog.health';
     HttpModule,
   ],
   controllers: [AppController, HealthCheckController],
+  // DogHealthIndicator를 HealthCheckController에서 사용하기 위해 주입.
   providers: [AppService, AuthService, DogHealthIndicator],
 })
 export class AppModule implements NestModule {

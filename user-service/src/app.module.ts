@@ -15,6 +15,7 @@ import emailConfig from 'config/emailConfig';
 import authConfig from 'config/authConfig';
 import { ormConfig } from 'config/ormConfig';
 import { LoggingModule } from 'logging/logging.module';
+import { BatchModule } from './batch/batch.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LoggingModule } from 'logging/logging.module';
     TypeOrmModule.forRootAsync(ormConfig),
     ExceptionModule,
     LoggingModule,
+    BatchModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],

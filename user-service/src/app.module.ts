@@ -39,9 +39,11 @@ import { DogHealthIndicator } from 'health-check/dog.health';
     TerminusModule,
     HttpModule,
   ],
-  controllers: [AppController, HealthCheckController],
+  // controllers: [AppController, HealthCheckController],
+  controllers: [AppController],
   // DogHealthIndicator를 HealthCheckController에서 사용하기 위해 주입.
-  providers: [AppService, AuthService, DogHealthIndicator],
+  // providers: [AppService, AuthService, DogHealthIndicator],
+  providers: [AppService, AuthService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

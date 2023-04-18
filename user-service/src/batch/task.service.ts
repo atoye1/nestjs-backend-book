@@ -8,7 +8,7 @@ export class TaskService {
     this.addCronJob();
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS, { name: 'DB Health Check' })
+  // @Cron(CronExpression.EVERY_10_SECONDS, { name: 'DB Health Check' })
   handleCron() {
     this.logger.log(`${new Date()} Cron Task Called`);
   }

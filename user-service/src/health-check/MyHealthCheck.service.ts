@@ -17,7 +17,7 @@ export class MyHealthCheckService {
     private dogs: DogHealthIndicator,
   ) {}
 
-  @Cron('*/5 * * * * *')
+  // @Cron('*/5 * * * * *')
   @HealthCheck()
   check() {
     return this.health.check([

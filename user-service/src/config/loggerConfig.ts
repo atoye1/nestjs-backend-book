@@ -12,6 +12,7 @@ export const loggerConfig = {
         format: winston.format.combine(
           winston.format.colorize({ all: true }),
           winston.format.timestamp(),
+          winston.format.prettyPrint(),
           nestWinstonModuleUtilities.format.nestLike('SeolApp', {
             prettyPrint: true,
           }),

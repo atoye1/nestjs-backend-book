@@ -130,6 +130,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-ormconfig.ts
+user-service/ormconfig.ts
 src/migrations/**
 dist/migrations/**

@@ -25,14 +25,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const response = (exception as HttpException).getResponse();
 
-    const log = {
+    const logObj = {
       timestamp: new Date(),
       url: req.url,
       response,
       stack,
     };
 
-    this.logger.log(log);
-    res.status((exception as HttpException).getStatus()).json(response);
+    this.logger.log('--------------------');
+    this.logger.log(JSON.stringify(logObj));
+    // for (const key in log) {
+    //   this.logger.log(log[key]);
+    // }
+    this.logger.log('--------------------');
+    return res.status((exception as HttpException).getStatus()).json(response);
   }
 }

@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersExampleModule } from 'providers-example/providers-example.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
-import emailConfig from 'config/emailConfig';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { validationSchema } from 'config/validationSchema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerMiddleWare } from './logger/logger.middleware';
@@ -12,11 +11,12 @@ import { LoggerMiddleWare2 } from './logger/logger.middleware2';
 import { UsersController } from 'users/users.controller';
 import { AuthService } from './auth/auth.service';
 import { ExceptionModule } from './exception/exception.module';
+import emailConfig from 'config/emailConfig';
 import authConfig from 'config/authConfig';
+import { ormConfig } from 'config/ormConfig';
 
 @Module({
   imports: [
-    ExceptionModule,
     ProvidersExampleModule,
     UsersModule,
     ConfigModule.forRoot({
@@ -26,16 +26,7 @@ import authConfig from 'config/authConfig';
       isGlobal: true, // 글로벌 스코프에서 사용가능하도록 한다.
       validationSchema: validationSchema, // joi를 활용한 유효성 검사 객체를 추가한다.
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DATABASE_HOST,
-      port: +process.env.DATABASE_PORT,
-      username: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_DB,
-      entities: [__dirname + '/**/*.entity.{ts,js}'],
-      synchronize: process.env.DATABASE_SYNCHRONIZE === 'true', // 서버 구동시 엔티티 기반으로 스키마를 변경하는 옵션이다.
-    }),
+    TypeOrmModule.forRootAsync(ormConfig),
     ExceptionModule,
   ],
   controllers: [AppController],

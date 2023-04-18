@@ -1,9 +1,9 @@
-import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersExampleModule } from 'providers-example/providers-example.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from 'config/validationSchema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerMiddleWare } from './logger/logger.middleware';
@@ -16,10 +16,8 @@ import authConfig from 'config/authConfig';
 import { ormConfig } from 'config/ormConfig';
 import { LoggingModule } from 'logging/logging.module';
 import { BatchModule } from './batch/batch.module';
-import { HealthCheckController } from './health-check/healthCheck.controller';
-import { HealthCheckService, TerminusModule } from '@nestjs/terminus';
+import { TerminusModule } from '@nestjs/terminus';
 import { HttpModule } from '@nestjs/axios';
-import { DogHealthIndicator } from 'health-check/dog.health';
 
 @Module({
   imports: [

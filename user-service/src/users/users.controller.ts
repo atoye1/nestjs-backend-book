@@ -13,6 +13,7 @@ import {
   Logger,
   HttpException,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserDto } from './dto/createUserDto';
 import { VerifyEmailDto } from './dto/VerifyEmailDto';
 import { UserLoginDto } from './dto/UserLoginDto';
@@ -20,12 +21,15 @@ import { UsersService } from './users.service';
 import { AuthService } from 'auth/auth.service';
 import { UserInfo } from './Userinfo';
 import { AuthGuard } from 'guards/auth.guard';
+import { CreateUserCommand } from './command/createUser.command';
+import { VerifyEmailCommand } from './command/verifyEmail.command';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
+    private commandBus: CommandBus,
     @Inject(Logger) private readonly logger: LoggerService,
   ) {}
 
@@ -38,14 +42,15 @@ export class UsersController {
   async createUser(@Body() dto: CreateUserDto): Promise<any> {
     this.printLoggerServiceLog(dto);
     const { name, email, password } = dto;
-    return this.usersService.createUser(name, email, password);
+    const command = new CreateUserCommand(name, email, password);
+    return this.commandBus.execute(command);
   }
 
   @Post('/email-verify')
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<any> {
     const { signupVerifyToken } = dto;
-    console.log(dto);
-    return await this.usersService.verifyEmail(signupVerifyToken);
+    const command = new VerifyEmailCommand(signupVerifyToken);
+    return this.commandBus.execute(command);
   }
 
   @Post('/login')

@@ -8,7 +8,6 @@ import { validationSchema } from 'config/validationSchema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerMiddleWare } from './logger/logger.middleware';
 import { LoggerMiddleWare2 } from './logger/logger.middleware2';
-import { UsersController } from 'users/users.controller';
 import { AuthService } from './auth/auth.service';
 import { ExceptionModule } from './exception/exception.module';
 import emailConfig from 'config/emailConfig';

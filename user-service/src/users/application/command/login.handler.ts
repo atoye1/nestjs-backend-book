@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LoginCommand } from './login.command';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../entitiy/user.entity';
+import { UserEntity } from '../../entitiy/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'auth/auth.service';
 

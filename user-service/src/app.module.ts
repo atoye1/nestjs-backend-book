@@ -32,7 +32,7 @@ import { HttpModule } from '@nestjs/axios';
     }),
     TypeOrmModule.forRootAsync(ormConfig),
     ExceptionModule,
-    LoggingModule,
+    // LoggingModule,
     BatchModule,
     TerminusModule,
     HttpModule,
